@@ -1,0 +1,91 @@
+plugins {
+    id "java-library"
+    id "io.qameta.allure" version "2.11.2"
+}
+
+group "study.qa"
+version "1.0-SNAPSHOT"
+
+def     allureVersion = '2.21.0',
+        slf4jVersion = "2.0.6",
+        junitVersion = "5.9.2",
+        restAssuredVersion = "5.3.0",
+        assertJVersion = "3.24.2"
+
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter {
+        aspectjWeaver.set(true)
+        frameworks {
+            junit5 {
+                adapterVersion.set(allureVersion)
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation (
+            "com.codeborne:selenide:6.12.3",
+            "io.qameta.allure:allure-selenide:$allureVersion",
+            "io.rest-assured:rest-assured:$restAssuredVersion",
+            "org.junit.jupiter:junit-jupiter:$junitVersion",
+            "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "io.appium:java-client:8.3.0",
+            "org.slf4j:slf4j-simple:$slf4jVersion",
+            "org.aeonbits.owner:owner:1.0.12",
+            "org.assertj:assertj-core:$assertJVersion",
+            "commons-io:commons-io:2.11.0"
+    )
+    testRuntimeOnly (
+            "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    )
+}
+
+tasks.withType(Test) {
+    systemProperties(System.getProperties())
+    useJUnitPlatform()
+
+    useJUnitPlatform{}
+
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+task real(type: Test) {
+    useJUnitPlatform {
+        includeTags("real")
+    }
+}
+
+task local(type: Test) {
+    useJUnitPlatform {
+        includeTags("local")
+    }
+}
+
+task android(type: Test) {
+    useJUnitPlatform {
+        includeTags("android")
+    }
+}
+
+task ios(type: Test) {
+    useJUnitPlatform {
+        includeTags("ios")
+    }
+}
